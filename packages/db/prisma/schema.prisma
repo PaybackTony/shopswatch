@@ -1,0 +1,108 @@
+// Chromé - Dress Color Search
+// Database schema for the enriched dress catalog
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Dress {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Product info
+  name        String
+  brand       String
+  price       Float
+  currency    String   @default("USD")
+  url         String   // Retailer product URL
+  imageUrl    String   // Primary product image
+  retailer    String   // Source retailer (nordstrom, asos, etc.)
+  externalId  String   // Retailer's product ID
+  available   Boolean  @default(true)
+
+  // Color data (populated by Claude enrichment pipeline)
+  colorRgbR   Int      // Primary color RGB
+  colorRgbG   Int
+  colorRgbB   Int
+  colorLabL   Float    // Primary color in CIELAB
+  colorLabA   Float
+  colorLabB   Float
+  colorName   String   // Human-readable name ("Dusty Rose")
+  colorHex    String   // Hex value (#C28686)
+
+  // Additional color metadata from Claude
+  pattern         String?  // "solid", "floral", "striped", "plaid", etc.
+  hasMultiColor   Boolean  @default(false)
+  secondaryColors Json?    // Array of { rgb, lab, name, weight } for multi-color garments
+  colorConfidence Float    @default(1.0) // Claude's confidence in color extraction (0-1)
+  colorNotes      String?  // Claude's notes ("warm studio lighting may affect accuracy")
+
+  // Categorization
+  category    String?  // "midi", "maxi", "mini", "shirt-dress", etc.
+  occasion    String?  // "casual", "formal", "cocktail", "work"
+  season      String?  // "spring", "summer", "fall", "winter", "all"
+  fabric      String?  // "silk", "cotton", "polyester", "linen", etc.
+
+  // Enrichment tracking
+  enrichedAt  DateTime? // When Claude last analyzed this product
+  enrichmentVersion Int @default(1) // Schema version for re-enrichment
+
+  @@unique([retailer, externalId])
+  @@index([colorLabL, colorLabA, colorLabB]) // For color search queries
+  @@index([brand])
+  @@index([retailer])
+  @@index([available])
+}
+
+model EnrichmentJob {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  status    String   @default("pending") // pending, processing, completed, failed
+  dressId   String
+  error     String?
+  attempts  Int      @default(0)
+  result    Json?    // Raw Claude API response for debugging
+
+  @@index([status])
+}
+
+// ── Swatch: a shareable collection of colors ──
+
+model Swatch {
+  id         String        @id @default(cuid())
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  name       String?       // Optional label, e.g. "Sarah's Wedding"
+  ownerToken String        @unique @default(cuid()) // Secret edit key
+
+  colors     SwatchColor[]
+
+  @@index([ownerToken])
+}
+
+model SwatchColor {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  swatchId  String
+  swatch    Swatch   @relation(fields: [swatchId], references: [id], onDelete: Cascade)
+
+  sortOrder Int      // Position within the swatch
+  hex       String   // e.g. "#C28686"
+  r         Int
+  g         Int
+  b         Int
+  name      String?  // Human-readable, e.g. "Dusty Rose"
+
+  @@index([swatchId])
+  @@unique([swatchId, sortOrder])
+}

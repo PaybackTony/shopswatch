@@ -1,0 +1,40 @@
+{
+  "name": "chrome-dress-color-search",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate --schema=packages/db/prisma/schema.prisma && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate --schema=packages/db/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=packages/db/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=packages/db/prisma/schema.prisma",
+    "db:seed": "node --require tsx/cjs scripts/seed-catalog.ts",
+    "enrich": "node --require tsx/cjs scripts/enrich-catalog.ts",
+    "import-feed": "node --require tsx/cjs scripts/import-feed.ts",
+    "scrape:azazie": "node --require tsx/cjs scripts/scrape-azazie.ts",
+    "scrape:davids": "node --require tsx/cjs scripts/scrape-davidsbridal.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@prisma/client": "^6.2.0",
+    "next": "^14.2.0",
+    "react": "^18.3.0",
+    "react-colorful": "^5.6.1",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "^14.2.0",
+    "postcss": "^8.4.0",
+    "prisma": "^6.2.0",
+    "tailwindcss": "^3.4.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.5.0"
+  }
+}

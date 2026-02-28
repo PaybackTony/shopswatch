@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400&display=swap");
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-cream font-sans text-neutral-900;
+  }
+}
+
+/* Masonry grid */
+.masonry-grid {
+  column-gap: 16px;
+}
+
+@media (min-width: 1280px) {
+  .masonry-grid {
+    column-count: 5;
+  }
+}
+@media (min-width: 1024px) and (max-width: 1279px) {
+  .masonry-grid {
+    column-count: 4;
+  }
+}
+@media (min-width: 768px) and (max-width: 1023px) {
+  .masonry-grid {
+    column-count: 3;
+  }
+}
+@media (min-width: 480px) and (max-width: 767px) {
+  .masonry-grid {
+    column-count: 2;
+  }
+}
+@media (max-width: 479px) {
+  .masonry-grid {
+    column-count: 1;
+  }
+}
+
+/* Card animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-card-in {
+  animation: fadeInUp 0.5s ease both;
+}
+
+/* Range slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  @apply bg-neutral-200 rounded-full;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  @apply bg-neutral-900 border-[3px] border-white shadow-md cursor-pointer;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Backdrop blur support */
+@supports (backdrop-filter: blur(8px)) {
+  .glass {
+    backdrop-filter: blur(8px);
+  }
+}
