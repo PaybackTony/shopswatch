@@ -102,7 +102,7 @@ export function SearchPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-neutral-100 bg-cream/95 glass">
         <div className="mx-auto max-w-[1400px] px-6 py-5 sm:px-8">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="font-display text-[28px] font-semibold tracking-tight text-neutral-900">
                 Shop by Color
@@ -112,7 +112,7 @@ export function SearchPage() {
               </p>
             </div>
 
-            <div className="flex shrink-0 items-center gap-3">
+            <div className="flex items-center gap-3">
               {/* Color selector */}
               <button
                 onClick={() => setDialogOpen(true)}

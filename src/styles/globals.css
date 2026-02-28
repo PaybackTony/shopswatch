@@ -42,7 +42,7 @@
 }
 @media (max-width: 479px) {
   .masonry-grid {
-    column-count: 1;
+    column-count: 2;
   }
 }
 
