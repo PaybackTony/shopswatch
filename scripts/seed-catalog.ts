@@ -6,7 +6,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { sRGBtoLab, rgbToHex } from "../packages/color-math/src/index";
+import { sRGBtoLab, rgbToHex } from "../lib/color-math/src/index";
 
 const prisma = new PrismaClient();
 

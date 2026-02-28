@@ -23,7 +23,7 @@ npm-debug.log*
 next-env.d.ts
 
 # prisma
-packages/db/prisma/migrations/
+lib/db/prisma/migrations/
 
 # misc
 .DS_Store

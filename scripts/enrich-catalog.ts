@@ -14,7 +14,7 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { PrismaClient } from "@prisma/client";
-import { sRGBtoLab } from "../packages/color-math/src/index";
+import { sRGBtoLab } from "../lib/color-math/src/index";
 
 const prisma = new PrismaClient();
 const anthropic = new Anthropic();

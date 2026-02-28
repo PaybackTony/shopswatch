@@ -13,7 +13,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { hexToRgb, sRGBtoLab } from "../packages/color-math/src/index";
+import { hexToRgb, sRGBtoLab } from "../lib/color-math/src/index";
 
 const prisma = new PrismaClient();
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
