@@ -1,0 +1,21 @@
+name: shopswatch
+services:
+  - name: web
+    github:
+      repo: PaybackTony/shopswatch
+      branch: main
+      deploy_on_push: true
+    build_command: npm run build
+    run_command: npm start
+    http_port: 3000
+    instance_size_slug: basic-xxs
+    envs:
+      - key: DATABASE_URL
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: ANTHROPIC_API_KEY
+        scope: RUN_AND_BUILD_TIME
+        type: SECRET
+      - key: NODE_ENV
+        scope: RUN_AND_BUILD_TIME
+        value: production
