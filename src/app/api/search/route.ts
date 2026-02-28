@@ -31,6 +31,7 @@ export interface SearchResult {
  * This avoids computing ΔE for the entire catalog on every request.
  */
 export async function GET(request: NextRequest) {
+  try {
   const params = request.nextUrl.searchParams;
 
   const r = parseInt(params.get("r") ?? "");
@@ -118,4 +119,8 @@ export async function GET(request: NextRequest) {
     targetColor: { r, g, b, lab: targetLab },
     params: { maxDe, limit, offset },
   });
+  } catch (err: any) {
+    console.error("Search error:", err);
+    return NextResponse.json({ error: err?.message ?? String(err), stack: err?.stack }, { status: 500 });
+  }
 }
