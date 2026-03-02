@@ -96,15 +96,11 @@ export function ColorPickerDialog({
   return (
     <div
       ref={overlayRef}
-      className="fixed inset-0 z-50 flex flex-col justify-end sm:items-center sm:justify-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
       style={{ background: "rgba(0,0,0,0.5)", backdropFilter: "blur(8px)" }}
       onClick={(e) => e.target === overlayRef.current && onClose()}
     >
-      <div className="animate-fade-in w-full max-h-[92dvh] overflow-y-auto rounded-t-[28px] bg-white shadow-[0_-8px_40px_rgba(0,0,0,0.18)] sm:max-w-[580px] sm:max-h-[88vh] sm:rounded-[28px] sm:shadow-[0_32px_80px_rgba(0,0,0,0.28)]">
-        {/* Drag handle — mobile only */}
-        <div className="flex justify-center pb-1 pt-3 sm:hidden">
-          <div className="h-1 w-10 rounded-full bg-neutral-200" />
-        </div>
+      <div className="animate-fade-in w-full max-h-[94dvh] overflow-y-auto rounded-[24px] bg-white shadow-[0_32px_80px_rgba(0,0,0,0.28)] sm:max-w-[580px] sm:max-h-[88vh] sm:rounded-[28px]">
 
         {/* ── Color band header ── */}
         <div

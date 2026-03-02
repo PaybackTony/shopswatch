@@ -16,6 +16,9 @@ export interface SearchResult {
   colorName: string;
   pattern: string | null;
   category: string | null;
+  occasion: string | null;
+  season: string | null;
+  fabric: string | null;
   deltaE: number;
 }
 
@@ -83,6 +86,9 @@ export async function GET(request: NextRequest) {
       colorLabB: true,
       pattern: true,
       category: true,
+      occasion: true,
+      season: true,
+      fabric: true,
     },
   });
 
@@ -105,6 +111,9 @@ export async function GET(request: NextRequest) {
         colorName: d.colorName,
         pattern: d.pattern,
         category: d.category,
+        occasion: d.occasion,
+        season: d.season,
+        fabric: d.fabric,
         deltaE: de,
       };
     })

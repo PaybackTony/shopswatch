@@ -6,12 +6,14 @@ import { ColorPickerDialog } from "@/components/ColorPickerDialog/ColorPickerDia
 import { MasonryGrid } from "@/components/MasonryGrid/MasonryGrid";
 import { DetailModal } from "@/components/DetailModal/DetailModal";
 import { rgbToHex } from "@color-math/index";
+import { useIsDevMode } from "@/lib/useIsDevMode";
 import type { SearchResult } from "@/app/api/search/route";
 
 const DEFAULT_COLOR: [number, number, number] = [188, 143, 143]; // Rosy Brown
 
 export function SearchPage() {
   const router = useRouter();
+  const isDevMode = useIsDevMode();
   const [selectedColor, setSelectedColor] = useState<
     [number, number, number] | null
   >(null);
@@ -159,27 +161,29 @@ export function SearchPage() {
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
               <p className="text-[13px] tracking-wide text-neutral-400">
                 {loading
-                  ? "Searching…"
-                  : `${total} ${total === 1 ? "match" : "matches"} · sorted by perceptual color distance`}
+                  ? "Searching..."
+                  : `${total} ${total === 1 ? "match" : "matches"}${isDevMode ? " · sorted by perceptual color distance" : " · sorted by best match"}`}
               </p>
 
               <div className="flex items-center gap-4">
-                <label className="flex items-center gap-2 text-xs text-neutral-400">
-                  <span>Tolerance</span>
-                  <input
-                    type="range"
-                    min={5}
-                    max={60}
-                    value={maxDeltaE}
-                    onChange={(e) =>
-                      handleToleranceChange(Number(e.target.value))
-                    }
-                    className="w-24"
-                  />
-                  <span className="min-w-[36px] font-mono text-[11px] text-neutral-500">
-                    ΔE {maxDeltaE}
-                  </span>
-                </label>
+                {isDevMode && (
+                  <label className="flex items-center gap-2 text-xs text-neutral-400">
+                    <span>Tolerance</span>
+                    <input
+                      type="range"
+                      min={5}
+                      max={60}
+                      value={maxDeltaE}
+                      onChange={(e) =>
+                        handleToleranceChange(Number(e.target.value))
+                      }
+                      className="w-24"
+                    />
+                    <span className="min-w-[36px] font-mono text-[11px] text-neutral-500">
+                      ΔE {maxDeltaE}
+                    </span>
+                  </label>
+                )}
                 <button
                   onClick={clearFilter}
                   className="text-xs text-neutral-400 transition-colors hover:text-neutral-700"
@@ -201,7 +205,7 @@ export function SearchPage() {
                 No dresses within this color range
               </p>
               <p className="mt-2 text-[13px] text-neutral-300">
-                Try increasing the tolerance slider
+                {isDevMode ? "Try increasing the tolerance slider" : "Try selecting a different shade"}
               </p>
             </div>
           ) : !selectedColor ? (
@@ -218,6 +222,7 @@ export function SearchPage() {
               results={results}
               selectedColor={selectedColor}
               onDressClick={setSelectedDress}
+              isDevMode={isDevMode}
             />
           )}
         </section>
@@ -237,6 +242,7 @@ export function SearchPage() {
           dress={selectedDress}
           targetColor={selectedColor}
           onClose={() => setSelectedDress(null)}
+          isDevMode={isDevMode}
         />
       )}
     </div>

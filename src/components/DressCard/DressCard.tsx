@@ -8,6 +8,7 @@ interface DressCardProps {
   dress: SearchResult;
   index: number;
   onClick: () => void;
+  isDevMode?: boolean;
 }
 
 const QUALITY_COLORS: Record<string, string> = {
@@ -28,20 +29,7 @@ const QUALITY_LABELS: Record<string, string> = {
   distant: "Distant",
 };
 
-/**
- * Deterministic pseudo-random card height based on dress ID.
- * In production, this would be the actual image aspect ratio.
- */
-function cardHeight(id: string): number {
-  let hash = 0;
-  for (let i = 0; i < id.length; i++) {
-    hash = (hash << 5) - hash + id.charCodeAt(i);
-    hash |= 0;
-  }
-  return 280 + (Math.abs(hash) % 180);
-}
-
-export function DressCard({ dress, index, onClick }: DressCardProps) {
+export function DressCard({ dress, index, onClick, isDevMode }: DressCardProps) {
   const [hovered, setHovered] = useState(false);
 
   const [r, g, b] = dress.colorRgb;
@@ -53,16 +41,14 @@ export function DressCard({ dress, index, onClick }: DressCardProps) {
   const quality = getMatchQuality(dress.deltaE);
   const qualityColor = QUALITY_COLORS[quality];
   const qualityLabel = QUALITY_LABELS[quality];
-  const height = cardHeight(dress.id);
 
   return (
     <div
       onClick={onClick}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className="animate-card-in mb-4 cursor-pointer overflow-hidden rounded-2xl"
+      className="animate-card-in cursor-pointer overflow-hidden rounded-2xl"
       style={{
-        breakInside: "avoid",
         animationDelay: `${index * 40}ms`,
         transition:
           "transform 0.3s cubic-bezier(0.2,0.8,0.2,1), box-shadow 0.3s ease",
@@ -76,20 +62,20 @@ export function DressCard({ dress, index, onClick }: DressCardProps) {
     >
       {/* Product image / color block */}
       <div
-        className="relative flex flex-col justify-end p-4"
+        className="relative overflow-hidden"
         style={{
-          height,
+          minHeight: dress.imageUrl ? undefined : 280,
           background: dress.imageUrl
             ? undefined
             : `linear-gradient(145deg, rgb(${r},${g},${b}), rgb(${Math.max(0, r - 20)},${Math.max(0, g - 20)},${Math.max(0, b - 20)}))`,
         }}
       >
-        {/* If we have an actual product image, show it */}
+        {/* Product image — natural aspect ratio drives the card height */}
         {dress.imageUrl && (
           <img
             src={dress.imageUrl}
             alt={dress.name}
-            className="absolute inset-0 h-full w-full object-cover"
+            className="block w-full"
             loading="lazy"
           />
         )}
@@ -105,7 +91,7 @@ export function DressCard({ dress, index, onClick }: DressCardProps) {
         )}
 
         {/* Match badge */}
-        <div className="glass absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5">
+        <div className="glass absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5">
           <div
             className="h-2 w-2 rounded-full"
             style={{
@@ -114,13 +100,13 @@ export function DressCard({ dress, index, onClick }: DressCardProps) {
             }}
           />
           <span className="text-[11px] font-medium tracking-wide text-white">
-            {qualityLabel} · ΔE {dress.deltaE.toFixed(1)}
+            {qualityLabel}{isDevMode ? ` · ΔE ${dress.deltaE.toFixed(1)}` : ""}
           </span>
         </div>
 
         {/* Color name */}
         <div
-          className="glass absolute right-3 top-3 rounded-lg px-2.5 py-1"
+          className="glass absolute right-3 top-3 z-10 rounded-lg px-2.5 py-1"
           style={{
             background: `rgba(${lum > 0.5 ? "0,0,0,0.08" : "255,255,255,0.12"})`,
           }}
@@ -133,19 +119,15 @@ export function DressCard({ dress, index, onClick }: DressCardProps) {
           </span>
         </div>
 
-        {/* Gradient overlay */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
+        {/* Gradient overlay + product info pinned to bottom */}
+        <div className="absolute inset-x-0 bottom-0 z-10 p-4 pt-16"
           style={{
             background:
               lum > 0.55
-                ? "linear-gradient(transparent, rgba(0,0,0,0.06))"
-                : "linear-gradient(transparent, rgba(0,0,0,0.25))",
+                ? "linear-gradient(transparent, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.15))"
+                : "linear-gradient(transparent, rgba(0,0,0,0.25) 30%, rgba(0,0,0,0.45))",
           }}
-        />
-
-        {/* Product info */}
-        <div className="relative z-10">
+        >
           <div
             className="font-display text-[17px] font-semibold leading-tight"
             style={{ color: textColor }}

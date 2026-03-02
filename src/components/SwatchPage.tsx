@@ -10,6 +10,7 @@ import {
 } from "@/components/SwatchColorBar/SwatchColorBar";
 import { ShareButton } from "@/components/ShareButton/ShareButton";
 import { rgbToHex } from "@color-math/index";
+import { useIsDevMode } from "@/lib/useIsDevMode";
 import type { SearchResult } from "@/app/api/search/route";
 
 interface SwatchPageProps {
@@ -24,6 +25,7 @@ interface SwatchPageProps {
 }
 
 export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
+  const isDevMode = useIsDevMode();
   const [colors, setColors] = useState<SwatchColorData[]>(swatch.colors);
   const [activeColor, setActiveColor] = useState<SwatchColorData | null>(
     swatch.colors[0] ?? null
@@ -218,25 +220,27 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
               <p className="text-[13px] tracking-wide text-neutral-400">
                 {loading
                   ? "Searching..."
-                  : `${total} ${total === 1 ? "match" : "matches"} for ${activeColor.name ?? activeColor.hex.toUpperCase()} · sorted by perceptual color distance`}
+                  : `${total} ${total === 1 ? "match" : "matches"} for ${activeColor.name ?? activeColor.hex.toUpperCase()}${isDevMode ? " · sorted by perceptual color distance" : " · sorted by best match"}`}
               </p>
 
-              <label className="flex items-center gap-2 text-xs text-neutral-400">
-                <span>Tolerance</span>
-                <input
-                  type="range"
-                  min={5}
-                  max={60}
-                  value={maxDeltaE}
-                  onChange={(e) =>
-                    handleToleranceChange(Number(e.target.value))
-                  }
-                  className="w-24"
-                />
-                <span className="min-w-[36px] font-mono text-[11px] text-neutral-500">
-                  &Delta;E {maxDeltaE}
-                </span>
-              </label>
+              {isDevMode && (
+                <label className="flex items-center gap-2 text-xs text-neutral-400">
+                  <span>Tolerance</span>
+                  <input
+                    type="range"
+                    min={5}
+                    max={60}
+                    value={maxDeltaE}
+                    onChange={(e) =>
+                      handleToleranceChange(Number(e.target.value))
+                    }
+                    className="w-24"
+                  />
+                  <span className="min-w-[36px] font-mono text-[11px] text-neutral-500">
+                    &Delta;E {maxDeltaE}
+                  </span>
+                </label>
+              )}
             </div>
           )}
 
@@ -273,7 +277,7 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
                 No dresses within this color range
               </p>
               <p className="mt-2 text-[13px] text-neutral-300">
-                Try increasing the tolerance slider
+                {isDevMode ? "Try increasing the tolerance slider" : "Try selecting a different shade"}
               </p>
             </div>
           ) : (
@@ -281,6 +285,7 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
               results={results}
               selectedColor={selectedColorRgb!}
               onDressClick={setSelectedDress}
+              isDevMode={isDevMode}
             />
           )}
         </section>
@@ -302,6 +307,7 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
           dress={selectedDress}
           targetColor={selectedColorRgb}
           onClose={() => setSelectedDress(null)}
+          isDevMode={isDevMode}
         />
       )}
     </div>
