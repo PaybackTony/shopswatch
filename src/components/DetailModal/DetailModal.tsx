@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { rgbToHex, sRGBtoLab, getMatchQuality } from "@color-math/index";
 import type { SearchResult } from "@/app/api/search/route";
 
@@ -21,6 +22,11 @@ export function DetailModal({ dress, targetColor, onClose, isDevMode }: DetailMo
   if (dress.fabric) details.push({ label: "Fabric", value: dress.fabric });
   if (dress.season) details.push({ label: "Season", value: dress.season });
   if (dress.pattern && dress.pattern !== "solid") details.push({ label: "Pattern", value: dress.pattern });
+
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
+  }, []);
 
   return (
     <div

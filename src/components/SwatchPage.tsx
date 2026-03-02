@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { ColorPickerDialog } from "@/components/ColorPickerDialog/ColorPickerDialog";
 import { MasonryGrid } from "@/components/MasonryGrid/MasonryGrid";
 import { DetailModal } from "@/components/DetailModal/DetailModal";
-import {
-  SwatchColorBar,
-  type SwatchColorData,
-} from "@/components/SwatchColorBar/SwatchColorBar";
+import { type SwatchColorData } from "@/components/SwatchColorBar/SwatchColorBar";
+import { SwatchColorStack } from "@/components/SwatchColorStack/SwatchColorStack";
+import { SwatchColorPopover } from "@/components/SwatchColorPopover/SwatchColorPopover";
 import { ShareButton } from "@/components/ShareButton/ShareButton";
 import { rgbToHex } from "@color-math/index";
 import { useIsDevMode } from "@/lib/useIsDevMode";
@@ -36,11 +35,20 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
   const [maxDeltaE, setMaxDeltaE] = useState(30);
   const [selectedDress, setSelectedDress] = useState<SearchResult | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [popoverOpen, setPopoverOpen] = useState(false);
   const [mutating, setMutating] = useState(false);
 
   const selectedColorRgb: [number, number, number] | null = activeColor
     ? [activeColor.r, activeColor.g, activeColor.b]
     : null;
+
+  // ── Auto-search the first color on mount ──
+  useEffect(() => {
+    if (activeColor) {
+      searchByColor([activeColor.r, activeColor.g, activeColor.b]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ── Search by color ──
   const searchByColor = useCallback(
@@ -163,57 +171,58 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
   return (
     <div className="min-h-screen bg-cream">
       {/* Header */}
-      <header className="sticky top-0 z-40 border-b border-neutral-100 bg-cream/95 glass">
-        <div className="mx-auto max-w-[1400px] px-6 py-5 sm:px-8">
-          <div className="flex items-center justify-between gap-4">
-            <div className="min-w-0">
-              <a
-                href="/"
-                className="text-[11px] font-medium tracking-wide text-neutral-400 transition-colors hover:text-neutral-600"
-              >
-                &larr; Shop by Color
-              </a>
-              <h1 className="font-display text-[28px] font-semibold tracking-tight text-neutral-900 truncate">
-                {swatch.name ?? "Color Swatch"}
-              </h1>
-              {!isOwner && (
-                <p className="mt-0.5 text-[13px] tracking-wide text-neutral-400">
-                  Click a color below to find matching dresses
-                </p>
-              )}
-              {isOwner && (
-                <p className="mt-0.5 text-[13px] tracking-wide text-neutral-400">
-                  Add colors to your swatch, then share with your bridesmaids
-                </p>
-              )}
-            </div>
+      <header className="sticky top-0 z-40 overflow-visible border-b border-neutral-100 bg-cream/95 glass">
+        <div className="mx-auto max-w-[1400px] px-6 py-4 sm:px-8">
+          <div className="flex items-center justify-between gap-3">
+            {/* Logo */}
+            <a href="/" className="shrink-0">
+              <img
+                src="/shoptheswatch.svg"
+                alt="Shop the Swatch"
+                className="h-10 sm:h-12 brightness-0"
+              />
+            </a>
 
-            {isOwner && (
-              <div className="shrink-0">
+            {/* Right side: Swatch + Share */}
+            <div className="flex items-center gap-3">
+              {colors.length > 0 && (
+                <div className="relative">
+                  <div className="rounded-full bg-white/90 px-3 py-1.5 shadow-sm border border-neutral-100">
+                    <SwatchColorStack
+                      colors={colors}
+                      activeColorId={activeColor?.id ?? null}
+                      isOwner={isOwner}
+                      onClick={() => setPopoverOpen(!popoverOpen)}
+                      onAddClick={() => setDialogOpen(true)}
+                    />
+                  </div>
+                  <SwatchColorPopover
+                    isOpen={popoverOpen}
+                    onClose={() => setPopoverOpen(false)}
+                    colors={colors}
+                    activeColorId={activeColor?.id ?? null}
+                    isOwner={isOwner}
+                    onSelectColor={(color) => {
+                      handleSelectColor(color);
+                      setPopoverOpen(false);
+                    }}
+                    onAddColor={() => setDialogOpen(true)}
+                    onRemoveColor={handleRemoveColor}
+                  />
+                </div>
+              )}
+
+              {/* Share button (desktop) */}
+              <div className="hidden sm:block shrink-0">
                 <ShareButton swatchId={swatch.id} />
               </div>
-            )}
+            </div>
           </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-[1400px] px-6 sm:px-8">
-        {/* Swatch color bar */}
-        <div className="py-6">
-          <SwatchColorBar
-            colors={colors}
-            activeColorId={activeColor?.id ?? null}
-            isOwner={isOwner}
-            onSelectColor={handleSelectColor}
-            onAddColor={() => setDialogOpen(true)}
-            onRemoveColor={handleRemoveColor}
-          />
-          {mutating && (
-            <div className="mt-2 text-[11px] text-neutral-400">Saving...</div>
-          )}
-        </div>
-
-        <section className="pb-12">
+        <section className="pb-12 pt-6">
           {/* Results bar */}
           {activeColor && (
             <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
@@ -300,6 +309,11 @@ export function SwatchPage({ swatch, isOwner, ownerToken }: SwatchPageProps) {
           onApply={handleAddColor}
         />
       )}
+
+      {/* Share button (mobile floating) */}
+      <div className="fixed bottom-5 right-5 z-40 sm:hidden">
+        <ShareButton swatchId={swatch.id} />
+      </div>
 
       {/* Detail Modal */}
       {selectedDress && selectedColorRgb && (

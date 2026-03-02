@@ -104,42 +104,27 @@ export function SearchPage() {
       {/* Header */}
       <header className="sticky top-0 z-40 border-b border-neutral-100 bg-cream/95 glass">
         <div className="mx-auto max-w-[1400px] px-6 py-5 sm:px-8">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <h1 className="font-display text-[28px] font-semibold tracking-tight text-neutral-900">
-                Shop by Color
-              </h1>
-              <p className="mt-1 text-[13px] tracking-wide text-neutral-400">
-                Find dresses by the color you see in your mind
-              </p>
+          <div className="flex items-center justify-between gap-3">
+            <div className="shrink-0">
+              <img
+                src="/shoptheswatch.svg"
+                alt="Shop the Swatch"
+                className="h-10 sm:h-12 brightness-0"
+              />
             </div>
 
             <div className="flex items-center gap-3">
               {/* Color selector */}
               <button
                 onClick={() => setDialogOpen(true)}
-                className="flex items-center gap-3 rounded-full border border-neutral-200 bg-white py-2 pl-2 pr-4 shadow-sm transition-all hover:border-neutral-300 hover:shadow-md"
-              >
-                {selectedColor ? (
-                  <div
-                    className="h-9 w-9 rounded-full border-2 border-white shadow-md"
-                    style={{ background: rgbToHex(...selectedColor) }}
-                  />
-                ) : (
-                  <div
-                    className="h-9 w-9 rounded-full border-2 border-white shadow-md"
-                    style={{
-                      background:
-                        "conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)",
-                    }}
-                  />
-                )}
-                <span className="text-sm font-medium text-neutral-600">
-                  {selectedColor
-                    ? rgbToHex(...selectedColor).toUpperCase()
-                    : "Choose a color"}
-                </span>
-              </button>
+                className="h-10 w-10 rounded-full border-2 border-white shadow-md transition-all hover:scale-110 hover:shadow-lg"
+                style={{
+                  background: selectedColor
+                    ? rgbToHex(...selectedColor)
+                    : "conic-gradient(from 0deg, #f00, #ff0, #0f0, #0ff, #00f, #f0f, #f00)",
+                }}
+                title={selectedColor ? rgbToHex(...selectedColor).toUpperCase() : "Choose a color"}
+              />
 
               {/* Create Swatch CTA */}
               <button

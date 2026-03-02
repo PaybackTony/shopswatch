@@ -50,6 +50,8 @@ export function ColorPickerDialog({
     setRecentColors(loadRecent());
     setMode("picker");
     if (initialColor) setHex(rgbToHex(...initialColor));
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = ""; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen]);
 

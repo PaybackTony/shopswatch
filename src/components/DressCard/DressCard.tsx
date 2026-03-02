@@ -35,8 +35,6 @@ export function DressCard({ dress, index, onClick, isDevMode }: DressCardProps) 
   const [r, g, b] = dress.colorRgb;
   const lum = relativeLuminance(r, g, b);
   const textColor = lum > 0.55 ? "#1a1a1a" : "#fafafa";
-  const subtextColor =
-    lum > 0.55 ? "rgba(0,0,0,0.5)" : "rgba(255,255,255,0.55)";
 
   const quality = getMatchQuality(dress.deltaE);
   const qualityColor = QUALITY_COLORS[quality];
@@ -90,19 +88,21 @@ export function DressCard({ dress, index, onClick, isDevMode }: DressCardProps) 
           />
         )}
 
-        {/* Match badge */}
-        <div className="glass absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5">
-          <div
-            className="h-2 w-2 rounded-full"
-            style={{
-              background: qualityColor,
-              boxShadow: `0 0 6px ${qualityColor}`,
-            }}
-          />
-          <span className="text-[11px] font-medium tracking-wide text-white">
-            {qualityLabel}{isDevMode ? ` · ΔE ${dress.deltaE.toFixed(1)}` : ""}
-          </span>
-        </div>
+        {/* Match badge (dev only) */}
+        {isDevMode && (
+          <div className="glass absolute left-3 top-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-3 py-1.5">
+            <div
+              className="h-2 w-2 rounded-full"
+              style={{
+                background: qualityColor,
+                boxShadow: `0 0 6px ${qualityColor}`,
+              }}
+            />
+            <span className="text-[11px] font-medium tracking-wide text-white">
+              {qualityLabel} · ΔE {dress.deltaE.toFixed(1)}
+            </span>
+          </div>
+        )}
 
         {/* Color name */}
         <div
@@ -120,26 +120,17 @@ export function DressCard({ dress, index, onClick, isDevMode }: DressCardProps) 
         </div>
 
         {/* Gradient overlay + product info pinned to bottom */}
-        <div className="absolute inset-x-0 bottom-0 z-10 p-4 pt-16"
+        <div className="absolute inset-x-0 bottom-0 z-10 p-4 pt-10"
           style={{
-            background:
-              lum > 0.55
-                ? "linear-gradient(transparent, rgba(0,0,0,0.06) 30%, rgba(0,0,0,0.15))"
-                : "linear-gradient(transparent, rgba(0,0,0,0.25) 30%, rgba(0,0,0,0.45))",
+            background: "linear-gradient(transparent, rgba(0,0,0,0.45) 70%, rgba(0,0,0,0.65))",
           }}
         >
-          <div
-            className="font-display text-[17px] font-semibold leading-tight"
-            style={{ color: textColor }}
-          >
+          <div className="font-display text-[17px] font-semibold leading-tight text-white">
             {dress.name}
           </div>
-          <div
-            className="mt-1 flex items-center justify-between text-xs tracking-wide"
-            style={{ color: subtextColor }}
-          >
+          <div className="mt-1 flex items-center justify-between text-xs tracking-wide text-white/60">
             <span>{dress.brand}</span>
-            <span className="font-semibold" style={{ color: textColor }}>
+            <span className="font-semibold text-white">
               ${dress.price}
             </span>
           </div>
